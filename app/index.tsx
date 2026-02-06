@@ -69,7 +69,7 @@ export default function HomePage() {
         end={{ x: 1, y: 1 }}
         style={styles.header}
       >
-        <Text style={styles.title}>Essence Match</Text>
+        <Text style={styles.title}>Perfumind</Text>
         <Text style={styles.subtitle}>
           Descubra fragrâncias que revelam sua essência única
         </Text>
