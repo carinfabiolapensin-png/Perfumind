@@ -24,7 +24,11 @@ export const FEMININE_PERFUMES: Perfume[] = [
     occasions: ['trabalho', 'casual', 'romântico'],
     sillage: 'moderado',
     longevity: 'boa',
-    year: 2007
+    year: 2007,
+    affiliateLinks: [
+      { store: 'Amazon', url: 'https://amzn.to/ch-herrera', price: 289.90, discount: 15 },
+      { store: 'Sephora', url: 'https://sephora.com.br/ch', price: 299.90 },
+    ]
   },
   {
     id: 'angel-mugler',
@@ -40,7 +44,11 @@ export const FEMININE_PERFUMES: Perfume[] = [
     occasions: ['noite', 'romântico', 'especial'],
     sillage: 'muito-forte',
     longevity: 'excelente',
-    year: 1992
+    year: 1992,
+    affiliateLinks: [
+      { store: 'Amazon', url: 'https://amzn.to/angel-mugler', price: 459.90, discount: 20 },
+      { store: 'Época Cosméticos', url: 'https://epoca.com.br/angel', price: 479.90 },
+    ]
   },
   {
     id: 'chanel-no5',
@@ -56,7 +64,11 @@ export const FEMININE_PERFUMES: Perfume[] = [
     occasions: ['especial', 'noite', 'formal'],
     sillage: 'forte',
     longevity: 'excelente',
-    year: 1921
+    year: 1921,
+    affiliateLinks: [
+      { store: 'Amazon', url: 'https://amzn.to/chanel-no5', price: 689.90, discount: 10 },
+      { store: 'Sephora', url: 'https://sephora.com.br/chanel-5', price: 699.90 },
+    ]
   },
   {
     id: 'tom-ford-black-orchid',

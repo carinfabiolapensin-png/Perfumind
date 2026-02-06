@@ -1,15 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, FlatList, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, FlatList, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import SearchBar from '@/components/ui/SearchBar';
 import PerfumeCard from '@/components/ui/PerfumeCard';
 import { IntelligentRecommendationService } from '@/services/recommendation';
 import { Perfume, SearchResult } from '@/types/perfume';
 import { FEMININE_PERFUMES, MASCULINE_PERFUMES } from '@/constants/perfumes';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function HomePage() {
+  const { user, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult>({ perfumes: [], searchTerm: '', fuzzyMatches: false });
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -69,7 +72,30 @@ export default function HomePage() {
         end={{ x: 1, y: 1 }}
         style={styles.header}
       >
-        <Text style={styles.title}>Perfumind</Text>
+        <View style={styles.headerTop}>
+          <Text style={styles.title}>Perfumind</Text>
+          {!isAuthenticated ? (
+            <TouchableOpacity 
+              style={styles.loginButton}
+              onPress={() => router.push('/(auth)/login')}
+            >
+              <Ionicons name="person-circle-outline" size={28} color="white" />
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.userInfo}>
+              <Text style={styles.userName}>{user?.name}</Text>
+              {user?.plan === 'free' && (
+                <TouchableOpacity 
+                  style={styles.premiumBadge}
+                  onPress={() => router.push('/(auth)/premium')}
+                >
+                  <Ionicons name="diamond-outline" size={16} color="#F59E0B" />
+                  <Text style={styles.premiumText}>Premium</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </View>
         <Text style={styles.subtitle}>
           Descubra fragrâncias que revelam sua essência única
         </Text>
@@ -138,14 +164,48 @@ const styles = StyleSheet.create({
   header: {
     padding: 32,
     paddingTop: 50,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 16,
+  },
+  loginButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userInfo: {
+    alignItems: 'flex-end',
+  },
+  userName: {
+    fontSize: 14,
+    color: 'white',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  premiumBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  premiumText: {
+    fontSize: 12,
+    color: '#F59E0B',
+    fontWeight: 'bold',
   },
   title: {
     fontSize: 36,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 12,
-    textAlign: 'center',
   },
   subtitle: {
     fontSize: 18,

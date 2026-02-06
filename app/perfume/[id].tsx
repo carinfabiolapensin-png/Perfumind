@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -9,8 +9,11 @@ import PersonalityInsight from '@/components/ui/PersonalityInsight';
 import { IntelligentRecommendationService } from '@/services/recommendation';
 import { Perfume, PersonalityProfile, RecommendationMatch } from '@/types/perfume';
 import { ALL_PERFUMES } from '@/constants/perfumes';
+import { useAuth } from '@/hooks/useAuth';
+import { PLAN_FEATURES } from '@/types/user';
 
 export default function PerfumeDetailPage() {
+  const { user } = useAuth();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [perfume, setPerfume] = useState<Perfume | null>(null);
   const [personalityProfile, setPersonalityProfile] = useState<PersonalityProfile | null>(null);
@@ -30,6 +33,16 @@ export default function PerfumeDetailPage() {
       }
     }
   }, [id]);
+
+  const handleAffiliateLink = async (url: string) => {
+    if (Platform.OS === 'web') {
+      window.open(url, '_blank');
+    } else {
+      await Linking.openURL(url);
+    }
+  };
+
+  const canViewAffiliateLinks = user && PLAN_FEATURES[user.plan].affiliateLinks;
 
   if (!perfume) {
     return (
@@ -99,6 +112,59 @@ export default function PerfumeDetailPage() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {personalityProfile && (
           <PersonalityInsight profile={personalityProfile} />
+        )}
+
+        {perfume.affiliateLinks && perfume.affiliateLinks.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.affiliateHeader}>
+              <Ionicons name="pricetag" size={24} color="#10B981" />
+              <Text style={styles.sectionTitle}>Onde Comprar</Text>
+              {!canViewAffiliateLinks && (
+                <TouchableOpacity 
+                  style={styles.premiumLockBadge}
+                  onPress={() => router.push('/(auth)/premium')}
+                >
+                  <Ionicons name="lock-closed" size={14} color="#F59E0B" />
+                  <Text style={styles.premiumLockText}>Premium</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            
+            {canViewAffiliateLinks ? (
+              perfume.affiliateLinks.map((link, index) => (
+                <TouchableOpacity 
+                  key={index}
+                  style={styles.affiliateCard}
+                  onPress={() => handleAffiliateLink(link.url)}
+                >
+                  <View style={styles.affiliateInfo}>
+                    <Ionicons name="storefront" size={20} color="#667eea" />
+                    <Text style={styles.affiliateStore}>{link.store}</Text>
+                  </View>
+                  <View style={styles.affiliatePrice}>
+                    {link.price && (
+                      <Text style={styles.price}>R$ {link.price.toFixed(2)}</Text>
+                    )}
+                    {link.discount && (
+                      <View style={styles.discountBadge}>
+                        <Text style={styles.discountText}>-{link.discount}%</Text>
+                      </View>
+                    )}
+                    <Ionicons name="open-outline" size={18} color="#6B7280" />
+                  </View>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <TouchableOpacity 
+                style={styles.lockedCard}
+                onPress={() => router.push('/(auth)/premium')}
+              >
+                <Ionicons name="lock-closed" size={32} color="#9CA3AF" />
+                <Text style={styles.lockedText}>Links exclusivos para membros Premium</Text>
+                <Text style={styles.lockedSubtext}>Desbloqueie descontos especiais</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         )}
 
         <View style={styles.section}>
@@ -336,6 +402,96 @@ const styles = StyleSheet.create({
     color: '#374151',
     lineHeight: 24,
     fontWeight: '400',
+  },
+  affiliateHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
+  premiumLockBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+    marginLeft: 'auto',
+  },
+  premiumLockText: {
+    fontSize: 12,
+    color: '#F59E0B',
+    fontWeight: 'bold',
+  },
+  affiliateCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+  },
+  affiliateInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  affiliateStore: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  affiliatePrice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  price: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#10B981',
+  },
+  discountBadge: {
+    backgroundColor: '#FEE2E2',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  discountText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#EF4444',
+  },
+  lockedCard: {
+    backgroundColor: '#F9FAFB',
+    padding: 32,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+  },
+  lockedText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4B5563',
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  lockedSubtext: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    marginTop: 4,
+    textAlign: 'center',
   },
   errorContainer: {
     flex: 1,

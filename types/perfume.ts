@@ -1,35 +1,48 @@
-export interface PerfumeNote {
+export type NoteFamily = 'citrus' | 'floral' | 'woody' | 'oriental' | 'fresh' | 'aromatic' | 'gourmand' | 'green' | 'spicy' | 'leather' | 'mineral';
+export type Gender = 'feminino' | 'masculino' | 'unissex';
+export type Season = 'primavera' | 'verão' | 'outono' | 'inverno';
+export type Occasion = 'casual' | 'trabalho' | 'noite' | 'especial' | 'romântico' | 'esporte' | 'formal' | 'praia' | 'viagem' | 'urbano' | 'artístico' | 'cultural' | 'natural' | 'poder' | 'luxo' | 'íntimo' | 'conforto' | 'celebração';
+export type Sillage = 'leve' | 'moderado' | 'forte' | 'muito-forte';
+export type Longevity = 'curta' | 'moderada' | 'boa' | 'excelente';
+
+export interface Note {
   name: string;
-  intensity: number; // 1-10
-  family: 'citrus' | 'floral' | 'woody' | 'oriental' | 'fresh' | 'gourmand' | 'aromatic';
-  characteristics?: string;
+  intensity?: number; // 1-10
+  family: NoteFamily;
+}
+
+export interface AffiliateLink {
+  store: string;
+  url: string;
+  price?: number;
+  discount?: number;
 }
 
 export interface Perfume {
   id: string;
   name: string;
   brand: string;
-  gender: 'feminino' | 'masculino';
-  topNotes: PerfumeNote[];
-  heartNotes: PerfumeNote[];
-  baseNotes: PerfumeNote[];
+  gender: Gender;
+  topNotes: Note[];
+  heartNotes: Note[];
+  baseNotes: Note[];
   description: string;
   personalityTraits: string[];
-  season: ('primavera' | 'verão' | 'outono' | 'inverno')[];
-  occasions: string[];
-  sillage: 'baixo' | 'moderado' | 'forte' | 'muito-forte';
-  longevity: 'fraca' | 'moderada' | 'boa' | 'excelente';
+  season?: Season[];
+  occasions?: Occasion[];
+  sillage: Sillage;
+  longevity: Longevity;
   year?: number;
-  price?: string;
+  affiliateLinks?: AffiliateLink[];
 }
 
 export interface RecommendationMatch {
   perfume: Perfume;
-  matchScore: number;
+  matchScore: number; // 0-100
   commonNotes: string[];
   reason: string;
-  personalityAlignment: number;
-  olfactoryCompatibility: number;
+  personalityAlignment: number; // 0-100
+  olfactoryCompatibility: number; // 0-100
 }
 
 export interface PersonalityProfile {
@@ -47,16 +60,6 @@ export interface PersonalityProfile {
   };
   essenceDescription: string;
   compatibilityInsights: string[];
-}
-
-export interface UserProfile {
-  currentPerfumes: Perfume[];
-  personalityProfile?: PersonalityProfile;
-  preferences: {
-    gender: 'feminino' | 'masculino' | 'both';
-    occasions: string[];
-    intensity: 'leve' | 'moderada' | 'intensa';
-  };
 }
 
 export interface SearchResult {
