@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { Analytics } from '@vercel/analytics/react';
 
 export default function RootLayout() {
   return (
@@ -13,6 +14,7 @@ export default function RootLayout() {
           <Stack.Screen name="(auth)/signup" />
           <Stack.Screen name="(auth)/premium" options={{ presentation: 'modal' }} />
         </Stack>
+        <Analytics />
       </AuthProvider>
     </SafeAreaProvider>
   );
